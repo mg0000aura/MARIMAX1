@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 /**
  * MARIMAX — Home
@@ -8,22 +9,22 @@ import React, { useEffect, useRef, useState } from "react";
  * de propósito, prontos para você preencher.
  */
 const COMPANY = {
-  slogan: "Alfaiataria com atitude de rua.",
+  slogan: "Materiais prontos para o seu negócio.",
   description:
-    "A MARIMAX desenha e cura peças que cruzam o acabamento da alfaiataria com a atitude da rua. Cada lançamento é numerado, rastreável e feito para durar.",
+    "A MARIMAX cria cardápios, anúncios, planilhas e tabelas prontos para usar — sem precisar contratar um designer do zero.",
   whatWeDo:
-    "Criamos, produzimos e curamos peças autorais — do desenho à entrega. Trabalhamos em lotes pequenos, com acabamento premium e identidade forte, para quem não quer se vestir como todo mundo.",
+    "Produzimos materiais digitais editáveis para pequenos negócios: cardápios, artes de anúncio, planilhas de gestão e tabelas de preço. Você escolhe o produto, personaliza com as suas informações e já sai usando.",
   products: [
-    { name: "Streetwear autoral", desc: "Peças de coleção própria, numeradas e datadas." },
-    { name: "Edições limitadas", desc: "Drops pequenos, produção controlada, sem reposição." },
-    { name: "Acessórios em couro e metal", desc: "Detalhes que fecham o look — feitos à mão." },
-    { name: "Consultoria de estilo", desc: "Curadoria sob encomenda para quem prefere ser vestido, não seguir tendência." },
+    { name: "Cardápio", desc: "Cardápio digital pronto para editar e imprimir." },
+    { name: "Anúncio", desc: "Artes prontas para divulgar promoções e produtos nas redes." },
+    { name: "Planilha", desc: "Planilhas de controle financeiro e de vendas, em 3 opções." },
+    { name: "Tabela", desc: "Tabela de preços/catálogo organizada para seus clientes." },
   ],
   diffs: [
-    { title: "Numeradas", text: "Cada peça leva um número de série. Você sabe exatamente o que tem." },
-    { title: "Lote curto", text: "Produzimos pouco, de propósito. Raridade não é discurso de marketing." },
-    { title: "Acabamento de alfaiate", text: "Corte e costura tratados como em terno, aplicados à rua." },
-    { title: "Origem rastreável", text: "Do ateliê até você — sem intermediário escondendo processo." },
+    { title: "Pronto em minutos", text: "Sem esperar orçamento de designer — edite e use na hora." },
+    { title: "Preço acessível", text: "Materiais profissionais sem o custo de um projeto sob medida." },
+    { title: "Fácil de editar", text: "Arquivos simples, com instrução de uso incluída." },
+    { title: "Sem mensalidade", text: "Você compra uma vez e usa o quanto quiser." },
   ],
   // Deixe em 0 até ter o número real. Troque quando quiser.
   stats: { projects: 0, products: 0 },
@@ -298,10 +299,10 @@ export default function Home() {
         </div>
         <nav className="nav-links">
           <a href="#o-que-fazemos">A empresa</a>
-          <a href="#produtos">Produtos</a>
+          <Link to="/produtos">Produtos</Link>
           <a href="#diferenciais">Diferenciais</a>
         </nav>
-        <a href="#produtos" className="nav-cta">Entrar</a>
+        <Link to="/conta" className="nav-cta">Entrar</Link>
       </header>
 
       {/* HERO */}
@@ -313,7 +314,7 @@ export default function Home() {
         <p className="hero-desc">{COMPANY.description}</p>
         <div className="hero-ctas">
           <a href="#o-que-fazemos" className="btn btn-solid">Conheça a empresa</a>
-          <a href="#produtos" className="btn btn-line">Nossos produtos/serviços</a>
+          <Link to="/produtos" className="btn btn-line">Nossos produtos/serviços</Link>
         </div>
         <div className="scroll-cue">ROLAR</div>
       </section>

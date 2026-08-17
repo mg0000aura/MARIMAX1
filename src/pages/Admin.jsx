@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 /**
  * MARIMAX ADM — Painel Administrativo
@@ -79,6 +80,9 @@ export default function Admin() {
         .side-word{ font-size:13px; letter-spacing:.14em; }
         .side-word b{ font-weight:600; }
         .side-tag{ font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--ink-dim); display:block; }
+        .mx-adm a{ color:inherit; text-decoration:none; }
+        .side-back{ padding:12px 22px 0; font-size:11.5px; color:var(--ink-dim); margin-top:auto; }
+        .side-back:hover{ color:var(--ink); }
 
         .side-link{ padding:11px 22px; font-size:13px; color:var(--ink-dim); cursor:pointer; border-left:2px solid transparent; }
         .side-link:hover{ color:var(--ink); }
@@ -124,6 +128,7 @@ export default function Admin() {
             {n.label}
           </div>
         ))}
+        <Link to="/" className="side-back">← Ver site</Link>
       </aside>
 
       <main className="main">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { auth } from "../firebase";
 import {
   onAuthStateChanged,
@@ -53,8 +54,11 @@ export default function Conta() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Mono:wght@400;700&family=Work+Sans:wght@300;400;500;600&display=swap');
         :root{ --navy:#0B0E1A; --navy-2:#12172B; --gold:#B08A4E; --gold-soft:#C9A96E; --bone:#F3EFE6; --line:rgba(243,239,230,0.14); }
-        .mx-root{ background:var(--navy); color:var(--bone); font-family:'Work Sans',sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 6vw; }
+        .mx-root{ background:var(--navy); color:var(--bone); font-family:'Work Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 6vw; }
         .mx-root *{ box-sizing:border-box; }
+        .mx-root a{ color:inherit; text-decoration:none; }
+        .back{ font-size:12.5px; color:rgba(243,239,230,0.5); margin-bottom:24px; }
+        .back:hover{ color:var(--gold-soft); }
 
         .auth-card{ width:100%; max-width:380px; background:var(--navy-2); border:1px solid var(--line); padding:40px 32px; border-radius:2px; }
         .auth-title{ font-family:'Fraunces',serif; font-size:24px; margin:0 0 6px; text-align:center; }
@@ -81,6 +85,7 @@ export default function Conta() {
         .panel{ font-size:13.5px; color:rgba(243,239,230,0.7); line-height:1.7; }
       `}</style>
 
+      <Link to="/" className="back">← Voltar para a Home</Link>
       {!user ? (
         <div className="auth-card">
           <h1 className="auth-title">MARIMAX</h1>
