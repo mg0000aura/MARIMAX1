@@ -2,8 +2,16 @@ import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getProductById, currency } from "../data/products";
 
+function Bolt() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+      <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" fill="currentColor" />
+    </svg>
+  );
+}
+
 function Stars({ n }) {
-  return <span style={{ color: "#C9A96E", fontSize: 13 }}>{"★".repeat(n)}{"☆".repeat(5 - n)}</span>;
+  return <span style={{ color: "#E3BE86", fontSize: 13 }}>{"★".repeat(n)}{"☆".repeat(5 - n)}</span>;
 }
 
 export default function ProdutoDetalhe() {
@@ -14,71 +22,95 @@ export default function ProdutoDetalhe() {
 
   if (!product) {
     return (
-      <div style={{ background: "#0B0E1A", color: "#F3EFE6", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", gap: 16 }}>
+      <div style={{ background: "#08090F", color: "#F3EFE6", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", gap: 16 }}>
         <p>Produto não encontrado.</p>
-        <Link to="/produtos" style={{ color: "#C9A96E" }}>← Voltar para o catálogo</Link>
+        <Link to="/produtos" style={{ color: "#E3BE86" }}>← Voltar para o catálogo</Link>
       </div>
     );
   }
 
   const variant = product.variants[variantIdx];
+  const off = variant.original ? Math.round((1 - variant.price / variant.original) * 100) : null;
 
   return (
     <div className="mx-root">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Mono:wght@400;700&family=Work+Sans:wght@300;400;500;600&display=swap');
-        :root{ --navy:#0B0E1A; --navy-2:#12172B; --gold:#B08A4E; --gold-soft:#C9A96E; --bone:#F3EFE6; --line:rgba(243,239,230,0.14); }
-        .mx-root{ background:var(--navy); color:var(--bone); font-family:'Work Sans',sans-serif; min-height:100vh; }
+        :root{
+          --navy:#08090F; --navy-2:#12131C; --card:#14151F;
+          --gold:#C89B5C; --gold-soft:#E3BE86; --bone:#F3EFE6;
+          --line:rgba(243,239,230,0.08); --ok:#4ADE80;
+        }
+        .mx-root{ position:relative; background:var(--navy); color:var(--bone); font-family:'Work Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
         .mx-root *{ box-sizing:border-box; }
         .mx-root a{ color:inherit; text-decoration:none; }
-        .topbar{ padding:20px 6vw; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; }
+
+        .fx{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .fx::before{ content:''; position:absolute; top:-10%; right:5%; width:55vw; height:55vw; background:radial-gradient(circle, rgba(200,155,92,0.14), transparent 60%); filter:blur(40px); }
+        .fx::after{ content:''; position:absolute; bottom:0; left:-10%; width:45vw; height:45vw; background:radial-gradient(circle, rgba(200,155,92,0.08), transparent 65%); filter:blur(40px); }
+
+        .topbar{ position:relative; z-index:1; padding:20px 6vw; display:flex; justify-content:space-between; align-items:center; }
         .brand{ font-family:'Fraunces',serif; letter-spacing:.1em; font-size:14px; }
-        .back{ font-size:12.5px; color:rgba(243,239,230,0.6); }
+        .back{ font-size:12.5px; color:rgba(243,239,230,0.5); }
         .back:hover{ color:var(--gold-soft); }
 
-        .wrap{ padding: 48px 6vw 100px; max-width:1200px; margin:0 auto; }
-        .top{ display:grid; grid-template-columns: 1fr 1fr; gap:56px; margin-bottom:70px; }
-        @media (max-width:820px){ .top{ grid-template-columns:1fr; gap:32px; } }
+        .wrap{ position:relative; z-index:1; padding: 30px 6vw 100px; max-width:1160px; margin:0 auto; }
+        .top{ display:grid; grid-template-columns: 1fr 1fr; gap:48px; margin-bottom:64px; }
+        @media (max-width:820px){ .top{ grid-template-columns:1fr; gap:28px; } }
 
-        .gallery-main{ aspect-ratio:4/5; background:linear-gradient(135deg, rgba(176,138,78,0.14), rgba(243,239,230,0.03)); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:11px; color:rgba(243,239,230,0.3); letter-spacing:.1em; margin-bottom:10px; }
+        .gallery-main{
+          aspect-ratio:4/5; border-radius:16px; position:relative;
+          background:
+            radial-gradient(circle at 30% 20%, rgba(200,155,92,0.22), transparent 55%),
+            linear-gradient(160deg, #1a1b28, #0d0e15);
+          display:flex; align-items:center; justify-content:center;
+          font-family:'Space Mono',monospace; font-size:11px; color:rgba(243,239,230,0.25); letter-spacing:.1em;
+        }
+        .badge-off{ position:absolute; top:14px; right:14px; background:rgba(74,222,128,0.15); color:var(--ok); font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; border:1px solid rgba(74,222,128,0.3); }
 
         .tag{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.14em; color:var(--gold-soft); text-transform:uppercase; }
-        .name{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.8rem,3.6vw,2.4rem); margin:10px 0 14px; }
+        .name{ font-family:'Fraunces',serif; font-weight:500; font-size:clamp(1.7rem,3.4vw,2.3rem); margin:8px 0 16px; }
 
         .variants{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
-        .variant-btn{ font-size:12.5px; padding:9px 14px; border:1px solid var(--line); border-radius:2px; cursor:pointer; background:transparent; color:rgba(243,239,230,0.7); }
-        .variant-btn.active{ border-color:var(--gold); color:var(--gold-soft); }
+        .variant-btn{ font-size:12.5px; padding:9px 14px; border:1px solid var(--line); border-radius:20px; cursor:pointer; background:var(--card); color:rgba(243,239,230,0.6); transition:all .2s; }
+        .variant-btn.active{ background:rgba(200,155,92,0.14); border-color:rgba(200,155,92,0.35); color:var(--gold-soft); }
 
-        .price{ font-family:'Fraunces',serif; font-size:26px; margin-bottom:20px; }
-        .price .original{ font-size:15px; color:rgba(243,239,230,0.4); text-decoration:line-through; margin-right:8px; }
-        .desc{ font-size:14.5px; line-height:1.8; color:rgba(243,239,230,0.72); margin-bottom:26px; }
+        .price-block{ background:var(--card); border-radius:14px; padding:18px 20px; margin-bottom:22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+        .price-left .original{ font-size:13px; color:rgba(243,239,230,0.35); text-decoration:line-through; }
+        .price-left .price{ font-family:'Fraunces',serif; font-size:26px; }
+        .pix{ display:flex; align-items:center; gap:5px; font-size:11.5px; color:rgba(243,239,230,0.45); margin-top:3px; }
+        .pix svg{ color:var(--gold-soft); }
 
-        .block{ margin-bottom:22px; }
-        .block-title{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(243,239,230,0.5); margin-bottom:10px; }
+        .desc{ font-size:14.5px; line-height:1.8; color:rgba(243,239,230,0.65); margin-bottom:24px; }
+
+        .block{ margin-bottom:20px; }
+        .block-title{ font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(243,239,230,0.45); margin-bottom:10px; }
         .block ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; }
-        .block li{ font-size:13.5px; color:rgba(243,239,230,0.75); }
-        .block li::before{ content:'— '; color:var(--gold-soft); }
+        .block li{ font-size:13.5px; color:rgba(243,239,230,0.7); }
+        .block li::before{ content:'✓ '; color:var(--gold-soft); }
 
-        .ctas{ display:flex; gap:12px; margin-top:28px; }
-        .btn{ flex:1; text-align:center; font-size:13px; padding:14px; border-radius:2px; cursor:pointer; letter-spacing:.03em; border:none; }
-        .btn-solid{ background:var(--gold); color:var(--navy); font-weight:600; border:1px solid var(--gold); }
+        .ctas{ display:flex; gap:10px; margin-top:26px; }
+        .btn{ text-align:center; font-size:13px; padding:14px; border-radius:12px; cursor:pointer; letter-spacing:.02em; border:none; }
+        .btn-solid{ flex:1; background:var(--bone); color:#0A0A0A; font-weight:600; }
         .btn-solid:hover{ background:var(--gold-soft); }
-        .btn-line{ border:1px solid var(--line); color:var(--bone); background:transparent; }
-        .btn-line:hover{ border-color:var(--gold-soft); color:var(--gold-soft); }
+        .btn-line{ flex:1; border:1px solid var(--line); color:var(--bone); background:transparent; }
+        .btn-line:hover{ border-color:rgba(200,155,92,0.4); color:var(--gold-soft); }
 
-        section.info{ padding:36px 0; border-top:1px solid var(--line); }
-        .info-title{ font-family:'Fraunces',serif; font-size:20px; margin:0 0 18px; }
+        section.info{ position:relative; z-index:1; padding:34px 0; border-top:1px solid var(--line); }
+        .info-title{ font-family:'Fraunces',serif; font-size:19px; margin:0 0 16px; }
 
-        .faq-item{ border-bottom:1px solid var(--line); padding:16px 0; cursor:pointer; }
-        .faq-q{ display:flex; justify-content:space-between; font-size:14.5px; }
-        .faq-a{ font-size:13.5px; color:rgba(243,239,230,0.65); margin-top:10px; line-height:1.6; }
+        .faq-item{ border-bottom:1px solid var(--line); padding:15px 0; cursor:pointer; }
+        .faq-q{ display:flex; justify-content:space-between; font-size:14px; }
+        .faq-a{ font-size:13.5px; color:rgba(243,239,230,0.6); margin-top:10px; line-height:1.6; }
 
-        .review{ padding:16px 0; border-bottom:1px solid var(--line); }
+        .review{ padding:14px 0; border-bottom:1px solid var(--line); }
         .review-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
         .review-name{ font-size:13px; color:var(--gold-soft); }
-        .review-comment{ font-size:13.5px; color:rgba(243,239,230,0.75); }
-        .no-reviews{ font-size:13.5px; color:rgba(243,239,230,0.45); font-style:italic; }
+        .review-comment{ font-size:13.5px; color:rgba(243,239,230,0.7); }
+        .no-reviews{ font-size:13.5px; color:rgba(243,239,230,0.4); font-style:italic; }
       `}</style>
+
+      <div className="fx" />
 
       <div className="topbar">
         <Link to="/" className="brand">MARIMAX</Link>
@@ -88,7 +120,10 @@ export default function ProdutoDetalhe() {
       <div className="wrap">
         <div className="top">
           <div>
-            <div className="gallery-main">SEM IMAGEM</div>
+            <div className="gallery-main">
+              SEM IMAGEM
+              {off && <span className="badge-off">↓ {off}%</span>}
+            </div>
           </div>
 
           <div>
@@ -109,10 +144,15 @@ export default function ProdutoDetalhe() {
               </div>
             )}
 
-            <div className="price">
-              {variant.original && <span className="original">{currency(variant.original)}</span>}
-              {currency(variant.price)}
+            <div className="price-block">
+              <div className="price-left">
+                {variant.original && <div className="original">{currency(variant.original)}</div>}
+                <div className="price">{currency(variant.price)}</div>
+                <div className="pix"><Bolt /> À vista no PIX</div>
+              </div>
+              {off && <span className="badge-off" style={{ position: "static" }}>↓ {off}%</span>}
             </div>
+
             <p className="desc">{product.desc}</p>
 
             <div className="block">
@@ -125,7 +165,7 @@ export default function ProdutoDetalhe() {
             </div>
             <div className="block">
               <div className="block-title">Para quem é</div>
-              <p style={{ fontSize: 13.5, color: "rgba(243,239,230,0.72)" }}>{product.forWhom}</p>
+              <p style={{ fontSize: 13.5, color: "rgba(243,239,230,0.65)" }}>{product.forWhom}</p>
             </div>
 
             <div className="ctas">
@@ -137,7 +177,7 @@ export default function ProdutoDetalhe() {
 
         <section className="info">
           <h2 className="info-title">Como funciona</h2>
-          <p style={{ fontSize: 14, color: "rgba(243,239,230,0.7)", lineHeight: 1.7 }}>{product.howItWorks}</p>
+          <p style={{ fontSize: 14, color: "rgba(243,239,230,0.65)", lineHeight: 1.7 }}>{product.howItWorks}</p>
         </section>
 
         <section className="info">
@@ -146,7 +186,7 @@ export default function ProdutoDetalhe() {
             <div className="faq-item" key={f.q} onClick={() => setOpenFaq(openFaq === i ? null : i)}>
               <div className="faq-q">
                 <span>{f.q}</span>
-                <span style={{ color: "#C9A96E" }}>{openFaq === i ? "–" : "+"}</span>
+                <span style={{ color: "#E3BE86" }}>{openFaq === i ? "–" : "+"}</span>
               </div>
               {openFaq === i && <div className="faq-a">{f.a}</div>}
             </div>

@@ -176,8 +176,8 @@ export default function Home() {
         .hero-bg{
           position:absolute; inset:0; z-index:0; pointer-events:none;
           background:
-            radial-gradient(ellipse at 50% 20%, rgba(176,138,78,0.14), transparent 55%),
-            repeating-linear-gradient(115deg, rgba(243,239,230,0.035) 0px, rgba(243,239,230,0.035) 1px, transparent 1px, transparent 64px);
+            radial-gradient(ellipse 60% 50% at 50% 15%, rgba(176,138,78,0.16), transparent 60%),
+            radial-gradient(ellipse 40% 40% at 85% 80%, rgba(176,138,78,0.08), transparent 65%);
         }
         .hero-mark{ width:132px; height:132px; margin:0 auto 28px; position:relative; z-index:1; }
         .mk-path{
@@ -264,8 +264,12 @@ export default function Home() {
         @media (max-width:820px){ .what-grid{ grid-template-columns:1fr; gap:40px; } }
 
         /* ---------- differentiators ---------- */
-        .diff-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
-        .diff-card{ background:var(--navy); padding:32px 26px; }
+        .fx{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .fx::before{ content:''; position:absolute; top:35%; left:-10%; width:45vw; height:45vw; background:radial-gradient(circle, rgba(176,138,78,0.06), transparent 65%); filter:blur(50px); }
+
+        .diff-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; }
+        .diff-card{ background:var(--navy-2); border-radius:14px; padding:28px 24px; box-shadow:0 0 0 1px rgba(243,239,230,0.04); transition:transform .2s, box-shadow .2s; }
+        .diff-card:hover{ transform:translateY(-3px); box-shadow:0 10px 26px rgba(0,0,0,0.35), 0 0 0 1px rgba(176,138,78,0.25); }
         .diff-title{ font-family:'Fraunces', serif; font-size:16px; color:var(--gold-soft); margin:0 0 10px; }
         .diff-text{ font-size:13.5px; line-height:1.6; color:rgba(243,239,230,0.65); margin:0; }
         @media (max-width:900px){ .diff-grid{ grid-template-columns: repeat(2,1fr); } }
@@ -290,6 +294,8 @@ export default function Home() {
         .foot-links a:hover{ color:var(--gold-soft); }
         .foot-bottom{ font-size:11.5px; color:rgba(243,239,230,0.35); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
       `}</style>
+
+      <div className="fx" />
 
       {/* NAV */}
       <header className="nav">

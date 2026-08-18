@@ -4,25 +4,20 @@ import { Link } from "react-router-dom";
 /**
  * MARIMAX ADM — Painel Administrativo
  * -----------------------------------------------------------------------
- * Identidade visual separada do site público, como pedido: preto e
- * branco, mais seco e funcional — não é "a mesma marca com cor trocada".
- * Marca aqui vira só monograma (M dentro do losango) em vez da wordmark
- * completa, reforçando que é um ambiente interno.
- *
- * SEÇÕES abaixo são placeholders de dado — ligue cada uma ao Firestore
- * (coleções sugeridas: products, orders, customers, users, banners,
- * coupons, news, pages, stats).
+ * Identidade separada do site público (preto/branco, sem dourado),
+ * mas com o mesmo princípio visual: fundo escuro com brilho suave atrás
+ * dos elementos, cards soltos em vez de tabelas cruas com grade pesada.
  */
 const NAV = [
-  { key: "dashboard", label: "Estatísticas" },
-  { key: "produtos", label: "Produtos" },
-  { key: "pedidos", label: "Pedidos" },
-  { key: "clientes", label: "Clientes" },
-  { key: "usuarios", label: "Usuários" },
-  { key: "banners", label: "Banners" },
-  { key: "promocoes", label: "Promoções / Cupons" },
-  { key: "noticias", label: "Novidades / Blog" },
-  { key: "textos", label: "Textos do site" },
+  { key: "dashboard", label: "Estatísticas", icon: "◧" },
+  { key: "produtos", label: "Produtos", icon: "◫" },
+  { key: "pedidos", label: "Pedidos", icon: "▤" },
+  { key: "clientes", label: "Clientes", icon: "◔" },
+  { key: "usuarios", label: "Usuários", icon: "◈" },
+  { key: "banners", label: "Banners", icon: "▭" },
+  { key: "promocoes", label: "Promoções / Cupons", icon: "◆" },
+  { key: "noticias", label: "Novidades / Blog", icon: "▥" },
+  { key: "textos", label: "Textos do site", icon: "▦" },
 ];
 
 const STATS = {
@@ -30,12 +25,11 @@ const STATS = {
   conversao: 0, clientesNovos: 0, clientesRecorrentes: 0,
 };
 
-function MonoMark({ dark }) {
-  const stroke = dark ? "#F5F5F5" : "#0A0A0A";
+function MonoMark() {
   return (
-    <svg viewBox="0 0 220 220" width="26" height="26" fill="none">
-      <polygon points="110,14 206,110 110,206 14,110" stroke={stroke} strokeWidth="3" />
-      <path d="M70 66 L110 132 L150 66 M78 66 L78 154 M142 66 L142 154" stroke={stroke} strokeWidth="3" strokeLinecap="square" />
+    <svg viewBox="0 0 220 220" width="24" height="24" fill="none">
+      <polygon points="110,14 206,110 110,206 14,110" stroke="#F5F5F5" strokeWidth="3" />
+      <path d="M70 66 L110 132 L150 66 M78 66 L78 154 M142 66 L142 154" stroke="#F5F5F5" strokeWidth="3" strokeLinecap="square" />
     </svg>
   );
 }
@@ -50,15 +44,8 @@ function StatCard({ label, value, money }) {
   );
 }
 
-function TablePlaceholder({ cols }) {
-  return (
-    <div className="table-shell">
-      <div className="table-row table-head">
-        {cols.map((c) => <div key={c} className="table-cell">{c}</div>)}
-      </div>
-      <div className="table-empty">Nenhum registro ainda — conecte a coleção correspondente.</div>
-    </div>
-  );
+function EmptyCard({ text }) {
+  return <div className="empty-card">{text}</div>;
 }
 
 export default function Admin() {
@@ -69,55 +56,59 @@ export default function Admin() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
         :root{
-          --bg:#0A0A0A; --panel:#141414; --line:#262626;
-          --ink:#F5F5F5; --ink-dim:#9A9A9A; --white:#FFFFFF;
+          --bg:#08090A; --panel:#131315; --card:#17181B;
+          --line:rgba(255,255,255,0.06); --ink:#F5F5F5; --ink-dim:#8C8C8C; --white:#FFFFFF;
         }
-        .mx-adm{ background:var(--bg); color:var(--ink); font-family:'Space Grotesk', sans-serif; min-height:100vh; display:flex; }
+        .mx-adm{ position:relative; background:var(--bg); color:var(--ink); font-family:'Space Grotesk', sans-serif; min-height:100vh; display:flex; overflow:hidden; }
         .mx-adm *{ box-sizing:border-box; }
+        .mx-adm a{ color:inherit; text-decoration:none; }
 
-        .sidebar{ width:230px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line); padding:24px 0; display:flex; flex-direction:column; }
-        .side-logo{ display:flex; align-items:center; gap:10px; padding:0 22px 24px; border-bottom:1px solid var(--line); margin-bottom:14px; }
+        .fx{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .fx::before{ content:''; position:absolute; top:-15%; left:20%; width:50vw; height:50vw; background:radial-gradient(circle, rgba(255,255,255,0.05), transparent 60%); filter:blur(50px); }
+
+        .sidebar{ position:relative; z-index:1; width:230px; flex-shrink:0; background:var(--panel); padding:22px 0; display:flex; flex-direction:column; border-right:1px solid var(--line); }
+        .side-logo{ display:flex; align-items:center; gap:10px; padding:0 20px 20px; margin-bottom:8px; }
         .side-word{ font-size:13px; letter-spacing:.14em; }
         .side-word b{ font-weight:600; }
         .side-tag{ font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--ink-dim); display:block; }
-        .mx-adm a{ color:inherit; text-decoration:none; }
-        .side-back{ padding:12px 22px 0; font-size:11.5px; color:var(--ink-dim); margin-top:auto; }
+
+        .side-link{ display:flex; align-items:center; gap:10px; padding:10px 20px; margin:2px 10px; font-size:13px; color:var(--ink-dim); cursor:pointer; border-radius:10px; transition:all .15s; }
+        .side-link .ic{ font-size:13px; opacity:.7; width:16px; text-align:center; }
+        .side-link:hover{ color:var(--ink); background:rgba(255,255,255,0.03); }
+        .side-link.active{ color:var(--white); background:rgba(255,255,255,0.07); }
+        .side-back{ margin-top:auto; padding:14px 20px 0; font-size:11.5px; color:var(--ink-dim); }
         .side-back:hover{ color:var(--ink); }
 
-        .side-link{ padding:11px 22px; font-size:13px; color:var(--ink-dim); cursor:pointer; border-left:2px solid transparent; }
-        .side-link:hover{ color:var(--ink); }
-        .side-link.active{ color:var(--white); border-left-color:var(--white); background:rgba(255,255,255,0.04); }
+        .main{ position:relative; z-index:1; flex:1; padding:30px 40px; overflow-x:auto; }
+        .main-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; }
+        .main-title{ font-size:21px; font-weight:600; margin:0; }
+        .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:var(--ink-dim); border:1px solid var(--line); padding:5px 11px; border-radius:20px; }
 
-        .main{ flex:1; padding:32px 40px; overflow-x:auto; }
-        .main-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; }
-        .main-title{ font-size:22px; font-weight:600; margin:0; }
-        .badge{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:var(--ink-dim); border:1px solid var(--line); padding:5px 10px; border-radius:2px; }
+        .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:32px; }
+        .stat-card{ background:var(--card); border-radius:14px; padding:20px; box-shadow:0 0 0 1px rgba(255,255,255,0.03); transition:transform .15s; }
+        .stat-card:hover{ transform:translateY(-2px); }
+        .stat-label{ font-family:'Space Mono',monospace; font-size:9.5px; letter-spacing:.1em; color:var(--ink-dim); text-transform:uppercase; margin-bottom:10px; }
+        .stat-value{ font-size:24px; font-weight:600; }
 
-        .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:36px; }
-        .stat-card{ background:var(--panel); padding:22px; }
-        .stat-label{ font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:var(--ink-dim); text-transform:uppercase; margin-bottom:10px; }
-        .stat-value{ font-size:26px; font-weight:600; }
+        .section-title{ font-size:14.5px; font-weight:600; margin:0 0 14px; }
+        .toolbar{ display:flex; gap:10px; margin-bottom:16px; }
+        .adm-btn{ font-size:12px; padding:10px 16px; border-radius:10px; cursor:pointer; letter-spacing:.02em; border:none; }
+        .adm-btn.solid{ background:var(--white); color:#0A0A0A; font-weight:600; }
+        .adm-btn.line{ border:1px solid var(--line); color:var(--ink); background:var(--card); }
+        .adm-btn.line:hover{ border-color:rgba(255,255,255,0.2); }
 
-        .section-title{ font-size:15px; font-weight:600; margin:0 0 14px; }
-        .table-shell{ border:1px solid var(--line); border-radius:2px; overflow:hidden; margin-bottom:36px; }
-        .table-row{ display:grid; grid-template-columns:repeat(var(--n,4), 1fr); }
-        .table-head{ background:var(--panel); }
-        .table-cell{ padding:12px 16px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); border-right:1px solid var(--line); }
-        .table-cell:last-child{ border-right:none; }
-        .table-empty{ padding:26px 16px; font-size:12.5px; color:var(--ink-dim); text-align:center; background:#0D0D0D; }
+        .cards-list{ display:flex; flex-direction:column; gap:8px; }
+        .row-card{ background:var(--card); border-radius:12px; padding:14px 18px; font-size:12.5px; color:var(--ink-dim); display:flex; justify-content:space-between; }
+        .empty-card{ background:var(--card); border-radius:14px; padding:40px 20px; text-align:center; font-size:12.5px; color:var(--ink-dim); border:1px dashed var(--line); }
 
-        .toolbar{ display:flex; gap:10px; margin-bottom:18px; }
-        .adm-btn{ font-size:12px; padding:9px 16px; border-radius:2px; cursor:pointer; letter-spacing:.03em; }
-        .adm-btn.solid{ background:var(--white); color:var(--bg); border:1px solid var(--white); font-weight:600; }
-        .adm-btn.line{ border:1px solid var(--line); color:var(--ink); background:transparent; }
-        .adm-btn.line:hover{ border-color:var(--ink-dim); }
-
-        .note{ font-size:12px; color:var(--ink-dim); font-style:italic; }
+        .note{ font-size:12px; color:var(--ink-dim); font-style:italic; margin-top:6px; }
       `}</style>
+
+      <div className="fx" />
 
       <aside className="sidebar">
         <div className="side-logo">
-          <MonoMark dark />
+          <MonoMark />
           <div>
             <span className="side-word"><b>MARIMAX</b></span>
             <span className="side-tag">ADMIN</span>
@@ -125,7 +116,7 @@ export default function Admin() {
         </div>
         {NAV.map((n) => (
           <div key={n.key} className={`side-link ${active === n.key ? "active" : ""}`} onClick={() => setActive(n.key)}>
-            {n.label}
+            <span className="ic">{n.icon}</span>{n.label}
           </div>
         ))}
         <Link to="/" className="side-back">← Ver site</Link>
@@ -158,47 +149,41 @@ export default function Admin() {
               <button className="adm-btn solid">+ Adicionar produto</button>
               <button className="adm-btn line">Importar</button>
             </div>
-            <TablePlaceholder cols={["Produto", "Categoria", "Preço", "Estoque"]} />
+            <EmptyCard text="Nenhum produto cadastrado por aqui ainda — os 4 produtos do catálogo público estão em src/data/products.js." />
           </>
         )}
 
-        {active === "pedidos" && (
-          <>
-            <TablePlaceholder cols={["Pedido", "Cliente", "Status", "Total"]} />
-          </>
-        )}
+        {active === "pedidos" && <EmptyCard text="Nenhum pedido ainda — conecte a coleção 'orders' do Firestore." />}
+        {active === "clientes" && <EmptyCard text="Nenhum cliente ainda — conecte a coleção 'customers'." />}
 
-        {active === "clientes" && <TablePlaceholder cols={["Cliente", "E-mail", "Pedidos", "Desde"]} />}
         {active === "usuarios" && (
           <>
-            <div className="toolbar">
-              <button className="adm-btn solid">+ Novo usuário</button>
-            </div>
-            <TablePlaceholder cols={["Usuário", "Nível de acesso", "Status"]} />
+            <div className="toolbar"><button className="adm-btn solid">+ Novo usuário</button></div>
+            <EmptyCard text="Nenhum usuário administrativo cadastrado." />
           </>
         )}
         {active === "banners" && (
           <>
             <div className="toolbar"><button className="adm-btn solid">+ Novo banner</button></div>
-            <TablePlaceholder cols={["Banner", "Posição", "Ativo"]} />
+            <EmptyCard text="Nenhum banner cadastrado." />
           </>
         )}
         {active === "promocoes" && (
           <>
             <div className="toolbar"><button className="adm-btn solid">+ Novo cupom</button></div>
-            <TablePlaceholder cols={["Cupom", "Desconto", "Validade", "Usos"]} />
+            <EmptyCard text="Nenhum cupom ativo." />
           </>
         )}
         {active === "noticias" && (
           <>
             <div className="toolbar"><button className="adm-btn solid">+ Nova publicação</button></div>
-            <TablePlaceholder cols={["Título", "Categoria", "Status", "Data"]} />
+            <EmptyCard text="Nenhuma publicação ainda." />
           </>
         )}
         {active === "textos" && (
           <>
             <p className="section-title">Textos editáveis do site</p>
-            <TablePlaceholder cols={["Bloco", "Página", "Última edição"]} />
+            <EmptyCard text="Ligue esta seção à coleção 'siteTexts' para editar os textos da Home direto por aqui." />
           </>
         )}
       </main>
