@@ -1,49 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import {
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
+import { useAuth } from "../context/AuthContext.jsx";
 
 /**
  * MARIMAX — Área do Cliente
  * -----------------------------------------------------------------------
  * Login persistente já vem de graça: src/firebase.js configura
  * browserLocalPersistence, então o Firebase mantém a sessão salva no
- * navegador sozinho. Este componente só escuta onAuthStateChanged.
+ * navegador sozinho.
+ *
+ * Redirecionamento: se o cliente chegou aqui porque tentou comprar sem
+ * estar logado (ver Produtos.jsx / ProdutoDetalhe.jsx), depois do login
+ * ele volta automaticamente pra página de onde veio.
  */
-const FAKE_AUTH = auth;
-
 export default function Conta() {
-  const [user, setUser] = useState(null);
-  const [mode, setMode] = useState("login"); // login | signup
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from || "/produtos";
+  const reason = location.state?.reason;
+
+  const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [error, setError] = useState("");
   const [tab, setTab] = useState("perfil");
 
-  useEffect(() => {
-    if (!FAKE_AUTH) return;
-    const unsub = onAuthStateChanged(FAKE_AUTH, (u) => setUser(u));
-    return () => unsub();
-  }, []);
-
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    if (!FAKE_AUTH) {
-      setError("Conecte o marimax-firebase.js para ativar login de verdade.");
-      return;
-    }
     try {
       if (mode === "login") {
-        await signInWithEmailAndPassword(FAKE_AUTH, email, pass);
+        await signInWithEmailAndPassword(auth, email, pass);
       } else {
-        await createUserWithEmailAndPassword(FAKE_AUTH, email, pass);
+        await createUserWithEmailAndPassword(auth, email, pass);
       }
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.message);
     }
@@ -60,15 +58,16 @@ export default function Conta() {
         .back{ font-size:12.5px; color:rgba(243,239,230,0.5); margin-bottom:24px; }
         .back:hover{ color:var(--gold-soft); }
 
-        .auth-card{ width:100%; max-width:380px; background:var(--navy-2); border:1px solid var(--line); padding:40px 32px; border-radius:2px; }
+        .auth-card{ width:100%; max-width:380px; background:var(--navy-2); border:1px solid var(--line); padding:40px 32px; border-radius:14px; }
         .auth-title{ font-family:'Fraunces',serif; font-size:24px; margin:0 0 6px; text-align:center; }
-        .auth-sub{ text-align:center; font-size:12.5px; color:rgba(243,239,230,0.5); margin-bottom:28px; }
+        .auth-sub{ text-align:center; font-size:12.5px; color:rgba(243,239,230,0.5); margin-bottom:20px; }
+        .auth-notice{ background:rgba(200,155,92,0.1); border:1px solid rgba(200,155,92,0.25); color:var(--gold-soft); font-size:12px; padding:10px 12px; border-radius:8px; margin-bottom:20px; text-align:center; }
         .field{ margin-bottom:16px; }
         .field label{ display:block; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:rgba(243,239,230,0.5); margin-bottom:6px; }
-        .field input{ width:100%; background:var(--navy); border:1px solid var(--line); color:var(--bone); padding:11px 13px; font-size:13.5px; border-radius:2px; outline:none; }
+        .field input{ width:100%; background:var(--navy); border:1px solid var(--line); color:var(--bone); padding:11px 13px; font-size:13.5px; border-radius:8px; outline:none; }
         .field input:focus{ border-color:var(--gold-soft); }
         .error{ font-size:12px; color:#D08A6B; margin-bottom:14px; }
-        .btn-solid{ width:100%; background:var(--gold); color:var(--navy); font-weight:600; border:1px solid var(--gold); padding:13px; border-radius:2px; cursor:pointer; font-size:13px; letter-spacing:.03em; }
+        .btn-solid{ width:100%; background:var(--gold); color:var(--navy); font-weight:600; border:1px solid var(--gold); padding:13px; border-radius:10px; cursor:pointer; font-size:13px; letter-spacing:.03em; }
         .btn-solid:hover{ background:var(--gold-soft); }
         .switch{ text-align:center; margin-top:18px; font-size:12.5px; color:rgba(243,239,230,0.55); }
         .switch button{ background:none; border:none; color:var(--gold-soft); cursor:pointer; font-size:12.5px; text-decoration:underline; }
@@ -76,7 +75,7 @@ export default function Conta() {
         .dash{ width:100%; max-width:900px; }
         .dash-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
         .dash-title{ font-family:'Fraunces',serif; font-size:24px; margin:0; }
-        .logout{ font-size:12px; border:1px solid var(--line); padding:9px 16px; border-radius:2px; cursor:pointer; background:transparent; color:var(--bone); }
+        .logout{ font-size:12px; border:1px solid var(--line); padding:9px 16px; border-radius:10px; cursor:pointer; background:transparent; color:var(--bone); }
         .logout:hover{ border-color:var(--gold-soft); color:var(--gold-soft); }
 
         .tabs{ display:flex; gap:6px; margin-bottom:26px; border-bottom:1px solid var(--line); }
@@ -90,6 +89,9 @@ export default function Conta() {
         <div className="auth-card">
           <h1 className="auth-title">MARIMAX</h1>
           <p className="auth-sub">{mode === "login" ? "Entre na sua conta" : "Criar conta"}</p>
+          {reason === "checkout" && (
+            <div className="auth-notice">Entre ou crie sua conta para finalizar a compra.</div>
+          )}
           <form onSubmit={handleSubmit}>
             <div className="field">
               <label>E-mail</label>
@@ -114,7 +116,7 @@ export default function Conta() {
         <div className="dash">
           <div className="dash-head">
             <h1 className="dash-title">Olá, {user.email}</h1>
-            <button className="logout" onClick={() => signOut(FAKE_AUTH)}>Sair</button>
+            <button className="logout" onClick={() => signOut(auth)}>Sair</button>
           </div>
           <div className="tabs">
             {["perfil", "pedidos", "favoritos", "cupons", "dados"].map((t) => (

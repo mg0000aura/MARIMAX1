@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { getProductById, currency } from "../data/products";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function Bolt() {
   return (
@@ -16,6 +17,8 @@ function Stars({ n }) {
 
 export default function ProdutoDetalhe() {
   const { id } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const product = getProductById(id);
   const [openFaq, setOpenFaq] = useState(null);
   const [variantIdx, setVariantIdx] = useState(0);
@@ -169,7 +172,19 @@ export default function ProdutoDetalhe() {
             </div>
 
             <div className="ctas">
-              <button className="btn btn-solid">Comprar agora</button>
+              <button
+                className="btn btn-solid"
+                onClick={() => {
+                  if (!user) {
+                    navigate("/conta", { state: { from: `/produtos/${id}`, reason: "checkout" } });
+                  } else {
+                    // usuário já logado — plugar fluxo de checkout real aqui
+                    alert("Login confirmado. Próximo passo: checkout (a implementar).");
+                  }
+                }}
+              >
+                Comprar agora
+              </button>
               <button className="btn btn-line">Solicitar orçamento</button>
             </div>
           </div>

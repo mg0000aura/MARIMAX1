@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PRODUCTS, CATEGORIES, currency } from "../data/products";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function Bolt() {
   return (
@@ -13,6 +14,17 @@ function Bolt() {
 export default function Produtos() {
   const [cat, setCat] = useState("Todos");
   const [q, setQ] = useState("");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  function handleBuyClick(e, productPath) {
+    if (!user) {
+      e.preventDefault();
+      navigate("/conta", { state: { from: productPath, reason: "checkout" } });
+    }
+    // se já estiver logado, o Link normal leva pra página do produto
+    // (troque por navigate direto pro checkout quando o checkout existir)
+  }
 
   const filtered = useMemo(() => {
     return PRODUCTS.filter((p) => {
@@ -170,7 +182,13 @@ export default function Produtos() {
                       {p.variants.length > 1 && <div className="from-note">a partir de · {p.variants.length} opções</div>}
                     </div>
                     <div className="card-ctas">
-                      <Link to={`/produtos/${p.id}`} className="btn btn-solid">Comprar</Link>
+                      <Link
+                        to={`/produtos/${p.id}`}
+                        className="btn btn-solid"
+                        onClick={(e) => handleBuyClick(e, `/produtos/${p.id}`)}
+                      >
+                        Comprar
+                      </Link>
                       <Link to={`/produtos/${p.id}`} className="btn btn-icon">→</Link>
                     </div>
                   </div>

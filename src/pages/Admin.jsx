@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { PRODUCTS, currency } from "../data/products";
 
 /**
  * MARIMAX ADM — Painel Administrativo
@@ -46,6 +47,34 @@ function StatCard({ label, value, money }) {
 
 function EmptyCard({ text }) {
   return <div className="empty-card">{text}</div>;
+}
+
+function ProductRow({ p }) {
+  const first = p.variants[0];
+  const withOriginal = p.variants.find((v) => v.original);
+  const off = withOriginal ? Math.round((1 - withOriginal.price / withOriginal.original) * 100) : null;
+  const lowest = p.variants.reduce((min, v) => (v.price < min ? v.price : min), first.price);
+
+  return (
+    <div className="prod-row">
+      <div className="prod-thumb">
+        {off && <span className="badge-off">↓ {off}%</span>}
+      </div>
+      <div className="prod-info">
+        <span className="prod-tag">{p.tag}</span>
+        <h4 className="prod-name">{p.name}</h4>
+        <span className="prod-cat">{p.category} · {p.variants.length} {p.variants.length > 1 ? "opções" : "opção"}</span>
+      </div>
+      <div className="prod-price">
+        {withOriginal && <span className="prod-original">{currency(withOriginal.original)}</span>}
+        <span className="prod-final">{currency(lowest)}</span>
+      </div>
+      <div className="prod-actions">
+        <button className="adm-btn line small">Editar</button>
+        <button className="adm-btn line small danger">Remover</button>
+      </div>
+    </div>
+  );
 }
 
 export default function Admin() {
@@ -101,6 +130,25 @@ export default function Admin() {
         .row-card{ background:var(--card); border-radius:12px; padding:14px 18px; font-size:12.5px; color:var(--ink-dim); display:flex; justify-content:space-between; }
         .empty-card{ background:var(--card); border-radius:14px; padding:40px 20px; text-align:center; font-size:12.5px; color:var(--ink-dim); border:1px dashed var(--line); }
 
+        .prod-list{ display:flex; flex-direction:column; gap:10px; }
+        .prod-row{ background:var(--card); border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:16px; box-shadow:0 0 0 1px rgba(255,255,255,0.03); }
+        .prod-thumb{
+          position:relative; width:56px; height:56px; border-radius:10px; flex-shrink:0;
+          background:radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08), transparent 60%), #1c1c1f;
+        }
+        .badge-off{ position:absolute; top:-6px; right:-6px; background:rgba(74,222,128,0.15); color:#4ADE80; font-size:9px; font-weight:600; padding:2px 5px; border-radius:8px; border:1px solid rgba(74,222,128,0.3); }
+        .prod-info{ flex:1; min-width:0; }
+        .prod-tag{ font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.08em; color:var(--ink-dim); text-transform:uppercase; }
+        .prod-name{ font-size:14px; margin:2px 0; font-weight:600; }
+        .prod-cat{ font-size:11px; color:var(--ink-dim); }
+        .prod-price{ text-align:right; flex-shrink:0; }
+        .prod-original{ display:block; font-size:11px; color:var(--ink-dim); text-decoration:line-through; }
+        .prod-final{ font-size:15px; font-weight:600; }
+        .prod-actions{ display:flex; gap:6px; flex-shrink:0; }
+        .adm-btn.small{ padding:7px 12px; font-size:11.5px; }
+        .adm-btn.danger{ color:#F08A72; border-color:rgba(240,138,114,0.25); }
+        .adm-btn.danger:hover{ border-color:rgba(240,138,114,0.5); }
+
         .note{ font-size:12px; color:var(--ink-dim); font-style:italic; margin-top:6px; }
       `}</style>
 
@@ -149,7 +197,10 @@ export default function Admin() {
               <button className="adm-btn solid">+ Adicionar produto</button>
               <button className="adm-btn line">Importar</button>
             </div>
-            <EmptyCard text="Nenhum produto cadastrado por aqui ainda — os 4 produtos do catálogo público estão em src/data/products.js." />
+            <div className="prod-list">
+              {PRODUCTS.map((p) => <ProductRow key={p.id} p={p} />)}
+            </div>
+            <p className="note">Esses são os mesmos produtos que aparecem no site público — editar aqui hoje é só visual; ligue ao Firestore para editar de verdade.</p>
           </>
         )}
 
